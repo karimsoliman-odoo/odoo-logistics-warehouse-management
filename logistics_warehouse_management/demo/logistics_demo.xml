@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="demo_partner_logistics" model="res.partner">
+        <field name="name">Demo Trading LLC</field>
+        <field name="email">demo@example.com</field>
+    </record>
+
+    <record id="demo_shipment_001" model="logistics.shipment">
+        <field name="partner_id" ref="demo_partner_logistics"/>
+        <field name="entry_date">2026-11-01</field>
+        <field name="exit_date">2026-11-10</field>
+        <field name="quantity">20</field>
+        <field name="cbm">14.5</field>
+        <field name="storage_rate">25</field>
+        <field name="state">done</field>
+        <field name="notes">Portfolio demo shipment.</field>
+    </record>
+
+    <record id="demo_shipment_002" model="logistics.shipment">
+        <field name="partner_id" ref="demo_partner_logistics"/>
+        <field name="entry_date">2026-11-05</field>
+        <field name="quantity">10</field>
+        <field name="cbm">7.25</field>
+        <field name="storage_rate">20</field>
+        <field name="state">stored</field>
+        <field name="notes">Active warehouse storage example.</field>
+    </record>
+</odoo>
