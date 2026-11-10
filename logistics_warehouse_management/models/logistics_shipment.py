@@ -17,7 +17,6 @@ class LogisticsShipment(models.Model):
         "res.partner",
         string="Customer",
         required=True,
-        tracking=True,
     )
     entry_date = fields.Date(
         string="Entry Date",
