@@ -1,6 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <menuitem id="menu_logistics_root" name="Logistics" sequence="10"/>
-    <menuitem id="menu_logistics_operations" name="Operations" parent="menu_logistics_root" sequence="10"/>
-    <menuitem id="menu_logistics_shipments" name="Shipments" parent="menu_logistics_operations" action="action_logistics_shipment" sequence="10"/>
+    <menuitem id="logistics_root_menu"
+              name="Logistics"
+              sequence="10"
+              groups="logistics_warehouse_management.group_logistics_user"/>
+
+    <menuitem id="logistics_operations_menu"
+              name="Operations"
+              parent="logistics_root_menu"
+              sequence="10"
+              groups="logistics_warehouse_management.group_logistics_user"/>
+
+    <menuitem id="logistics_shipments_menu"
+              name="Shipments"
+              parent="logistics_operations_menu"
+              action="logistics_shipment_action"
+              sequence="10"
+              groups="logistics_warehouse_management.group_logistics_user"/>
 </odoo>
