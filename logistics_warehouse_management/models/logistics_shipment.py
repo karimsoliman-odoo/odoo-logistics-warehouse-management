@@ -11,19 +11,29 @@ class LogisticsShipment(models.Model):
         string="Shipment Reference",
         required=True,
         copy=False,
+        readonly=True,
         default="New",
     )
     partner_id = fields.Many2one(
         "res.partner",
         string="Customer",
         required=True,
+        index=True,
+    )
+    company_id = fields.Many2one(
+        "res.company",
+        string="Company",
+        required=True,
+        default=lambda self: self.env.company,
+        index=True,
     )
     entry_date = fields.Date(
         string="Entry Date",
         required=True,
         default=fields.Date.context_today,
+        index=True,
     )
-    exit_date = fields.Date(string="Exit Date")
+    exit_date = fields.Date(string="Exit Date", index=True)
     quantity = fields.Float(string="Quantity", default=1.0)
     cbm = fields.Float(string="CBM")
     storage_rate = fields.Monetary(
@@ -58,8 +68,18 @@ class LogisticsShipment(models.Model):
         string="Status",
         default="draft",
         required=True,
+        index=True,
     )
     notes = fields.Text(string="Notes")
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if vals.get("name", "New") == "New":
+                vals["name"] = self.env["ir.sequence"].next_by_code(
+                    "logistics.shipment"
+                ) or "New"
+        return super().create(vals_list)
 
     @api.depends("entry_date", "exit_date", "storage_rate")
     def _compute_storage_values(self):
@@ -78,8 +98,24 @@ class LogisticsShipment(models.Model):
     @api.constrains("entry_date", "exit_date")
     def _check_dates(self):
         for shipment in self:
-            if shipment.exit_date and shipment.entry_date and shipment.exit_date < shipment.entry_date:
-                raise ValidationError("Exit Date cannot be earlier than Entry Date.")
+            if (
+                shipment.exit_date
+                and shipment.entry_date
+                and shipment.exit_date < shipment.entry_date
+            ):
+                raise ValidationError(
+                    "Exit Date cannot be earlier than Entry Date."
+                )
+
+    @api.constrains("quantity", "cbm", "storage_rate")
+    def _check_positive_values(self):
+        for shipment in self:
+            if shipment.quantity < 0:
+                raise ValidationError("Quantity cannot be negative.")
+            if shipment.cbm < 0:
+                raise ValidationError("CBM cannot be negative.")
+            if shipment.storage_rate < 0:
+                raise ValidationError("Storage Rate cannot be negative.")
 
     def action_set_stored(self):
         self.write({"state": "stored"})
@@ -89,6 +125,9 @@ class LogisticsShipment(models.Model):
 
     def action_set_done(self):
         self.write({"state": "done"})
+
+    def action_reset_to_draft(self):
+        self.write({"state": "draft"})
 
     def action_cancel(self):
         self.write({"state": "cancel"})
