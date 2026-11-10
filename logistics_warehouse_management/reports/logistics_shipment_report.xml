@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_logistics_shipment" model="ir.actions.report">
+        <field name="name">Shipment Summary</field>
+        <field name="model">logistics.shipment</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">logistics_warehouse_management.report_logistics_shipment</field>
+        <field name="report_file">logistics_warehouse_management.report_logistics_shipment</field>
+        <field name="binding_model_id" ref="model_logistics_shipment"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_logistics_shipment">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Shipment Summary</h2>
+                        <table class="table table-sm">
+                            <tbody>
+                                <tr>
+                                    <th>Reference</th>
+                                    <td><span t-field="o.name"/></td>
+                                    <th>Status</th>
+                                    <td><span t-field="o.state"/></td>
+                                </tr>
+                                <tr>
+                                    <th>Customer</th>
+                                    <td><span t-field="o.partner_id"/></td>
+                                    <th>Company</th>
+                                    <td><span t-field="o.company_id"/></td>
+                                </tr>
+                                <tr>
+                                    <th>Entry Date</th>
+                                    <td><span t-field="o.entry_date"/></td>
+                                    <th>Exit Date</th>
+                                    <td><span t-field="o.exit_date"/></td>
+                                </tr>
+                                <tr>
+                                    <th>Quantity</th>
+                                    <td><span t-field="o.quantity"/></td>
+                                    <th>CBM</th>
+                                    <td><span t-field="o.cbm"/></td>
+                                </tr>
+                                <tr>
+                                    <th>Storage Days</th>
+                                    <td><span t-field="o.storage_days"/></td>
+                                    <th>Storage Rate / Day</th>
+                                    <td><span t-field="o.storage_rate"/></td>
+                                </tr>
+                                <tr>
+                                    <th>Storage Amount</th>
+                                    <td colspan="3"><span t-field="o.storage_amount"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div t-if="o.notes">
+                            <strong>Notes</strong>
+                            <p t-field="o.notes"/>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>
