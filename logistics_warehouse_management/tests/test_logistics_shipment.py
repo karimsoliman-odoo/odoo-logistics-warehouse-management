@@ -4,8 +4,11 @@ from odoo.tests.common import TransactionCase
 class TestLogisticsShipment(TransactionCase):
 
     def test_storage_amount(self):
+        partner = self.env["res.partner"].create({
+            "name": "Demo Logistics Customer",
+        })
         shipment = self.env["logistics.shipment"].create({
-            "partner_id": self.env.ref("base.res_partner_1").id,
+            "partner_id": partner.id,
             "entry_date": "2026-01-01",
             "exit_date": "2026-01-10",
             "storage_rate": 25.0,
