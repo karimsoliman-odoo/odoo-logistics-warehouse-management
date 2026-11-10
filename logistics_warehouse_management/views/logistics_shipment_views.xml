@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="view_logistics_shipment_list" model="ir.ui.view">
+    <record id="logistics_shipment_view_list" model="ir.ui.view">
         <field name="name">logistics.shipment.list</field>
         <field name="model">logistics.shipment</field>
         <field name="arch" type="xml">
-            <list>
+            <list decoration-success="state == 'done'" decoration-muted="state == 'cancel'">
                 <field name="name"/>
                 <field name="partner_id"/>
                 <field name="entry_date"/>
@@ -12,29 +12,43 @@
                 <field name="quantity"/>
                 <field name="cbm"/>
                 <field name="storage_days"/>
-                <field name="storage_amount"/>
+                <field name="storage_amount" sum="Total Storage"/>
+                <field name="currency_id" column_invisible="True"/>
                 <field name="state"/>
             </list>
         </field>
     </record>
 
-    <record id="view_logistics_shipment_form" model="ir.ui.view">
+    <record id="logistics_shipment_view_form" model="ir.ui.view">
         <field name="name">logistics.shipment.form</field>
         <field name="model">logistics.shipment</field>
         <field name="arch" type="xml">
             <form string="Shipment">
                 <header>
-                    <button name="action_set_stored" type="object" string="Set Stored" invisible="state != 'draft'"/>
-                    <button name="action_set_outbound" type="object" string="Set Outbound" invisible="state != 'stored'"/>
-                    <button name="action_set_done" type="object" string="Set Done" invisible="state != 'outbound'"/>
-                    <button name="action_cancel" type="object" string="Cancel" invisible="state in ('done', 'cancel')"/>
-                    <field name="state" widget="statusbar"/>
+                    <button name="action_set_stored" type="object" string="Set Stored"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_set_outbound" type="object" string="Set Outbound"
+                            class="btn-primary" invisible="state != 'stored'"/>
+                    <button name="action_set_done" type="object" string="Set Done"
+                            class="btn-primary" invisible="state != 'outbound'"/>
+                    <button name="action_reset_to_draft" type="object" string="Reset to Draft"
+                            invisible="state not in ('cancel', 'done')"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="state in ('done', 'cancel')"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,stored,outbound,done"/>
                 </header>
                 <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
                     <group>
                         <group>
-                            <field name="name"/>
                             <field name="partner_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
                             <field name="entry_date"/>
                             <field name="exit_date"/>
                         </group>
@@ -55,9 +69,47 @@
         </field>
     </record>
 
-    <record id="action_logistics_shipment" model="ir.actions.act_window">
+    <record id="logistics_shipment_view_search" model="ir.ui.view">
+        <field name="name">logistics.shipment.search</field>
+        <field name="model">logistics.shipment</field>
+        <field name="arch" type="xml">
+            <search string="Search Shipments">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="entry_date"/>
+                <field name="exit_date"/>
+                <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Stored" name="stored" domain="[('state', '=', 'stored')]"/>
+                <filter string="Outbound" name="outbound" domain="[('state', '=', 'outbound')]"/>
+                <filter string="Done" name="done" domain="[('state', '=', 'done')]"/>
+                <filter string="Cancelled" name="cancelled" domain="[('state', '=', 'cancel')]"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter string="Customer" name="group_customer"
+                            context="{'group_by': 'partner_id'}"/>
+                    <filter string="Status" name="group_state"
+                            context="{'group_by': 'state'}"/>
+                    <filter string="Entry Month" name="group_entry_month"
+                            context="{'group_by': 'entry_date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="logistics_shipment_action" model="ir.actions.act_window">
         <field name="name">Shipments</field>
         <field name="res_model">logistics.shipment</field>
         <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="logistics_shipment_view_search"/>
+        <field name="context">{'search_default_stored': 0}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first logistics shipment.
+            </p>
+            <p>
+                Track warehouse entry and exit dates, CBM, storage days,
+                billing amounts, and operational status.
+            </p>
+        </field>
     </record>
 </odoo>
