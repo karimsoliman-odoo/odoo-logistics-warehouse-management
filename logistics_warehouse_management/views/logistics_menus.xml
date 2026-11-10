@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_logistics_root" name="Logistics" sequence="10"/>
+    <menuitem id="menu_logistics_operations" name="Operations" parent="menu_logistics_root" sequence="10"/>
+    <menuitem id="menu_logistics_shipments" name="Shipments" parent="menu_logistics_operations" action="action_logistics_shipment" sequence="10"/>
+</odoo>
